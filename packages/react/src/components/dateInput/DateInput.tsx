@@ -1,4 +1,4 @@
-import { format, parse, isValid, subYears, addYears, startOfMonth, endOfMonth } from 'date-fns';
+import { format, parse, isValid, subYears, addYears, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 import styles from './DateInput.module.scss';
@@ -258,8 +258,10 @@ export const DateInput = ({
 
     const isValidDate = isValid(valueAsDate) && (isDateDisabledBy ? !isDateDisabledBy(valueAsDate) : true);
 
-    // check if the date is outside the allowed range (if minDate and/or maxDate are set)
-    const isOutsideRange = (minDate ? valueAsDate < minDate : false) || (maxDate ? valueAsDate > maxDate : false);
+    // check if the date is outside the allowed range (if minDate and/or maxDate are set),
+    // by whole days like the date picker, so a minDate such as new Date() still allows that day
+    const isOutsideRange =
+      (minDate ? valueAsDate < startOfDay(minDate) : false) || (maxDate ? valueAsDate > endOfDay(maxDate) : false);
 
     if (isOutsideRange !== dateOutsideRange) {
       setDateOutsideRange(isOutsideRange);

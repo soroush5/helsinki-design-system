@@ -32,6 +32,7 @@ Changes that are not related to specific components
 #### Fixed
 
 - [Component] What bugs/typos are fixed?
+- [DateInput] A `minDate` or `maxDate` with a time of day, such as `new Date()`, no longer marks that day as outside the allowed range. The typed or picked day is compared by whole days, like the date picker does.
 
 ### Core
 

@@ -213,4 +213,41 @@ describe('<DateInput /> spec', () => {
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  describe('minDate and maxDate with a time of day', () => {
+    const outsideRange = 'Date is outside the allowed range';
+    const typeDate = (value: string) => {
+      const input = screen.getByRole('textbox');
+      fireEvent.change(input, { target: { value } });
+      fireEvent.blur(input);
+    };
+
+    it('accepts the minDate day when minDate is now', () => {
+      render(<DateInput id="date" label="Choose a date" minDate={new Date()} />);
+      typeDate('17.1.2021');
+      expect(screen.queryByText(outsideRange)).not.toBeInTheDocument();
+      typeDate('16.1.2021');
+      expect(screen.getByText(outsideRange)).toBeInTheDocument();
+    });
+
+    it('accepts the maxDate day when maxDate has a time of day', () => {
+      render(<DateInput id="date" label="Choose a date" maxDate={new Date(2021, 0, 20, 8, 30)} />);
+      typeDate('20.1.2021');
+      expect(screen.queryByText(outsideRange)).not.toBeInTheDocument();
+      typeDate('21.1.2021');
+      expect(screen.getByText(outsideRange)).toBeInTheDocument();
+    });
+
+    it('accepts the minDate day picked from the calendar', async () => {
+      const { container } = render(
+        <DateInput id="date" label="Choose a date" minDate={new Date()} disableConfirmation />,
+      );
+      await userEvent.click(screen.getByLabelText('Choose date'));
+      const day = container.querySelector('[data-date="2021-01-17"]') as HTMLButtonElement;
+      expect(day).not.toBeDisabled();
+      await userEvent.click(day);
+      expect(screen.getByRole('textbox')).toHaveValue('17.1.2021');
+      expect(screen.queryByText(outsideRange)).not.toBeInTheDocument();
+    });
+  });
 });
